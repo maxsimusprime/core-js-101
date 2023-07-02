@@ -20,10 +20,13 @@
  *    console.log(r.height);      // => 20
  *    console.log(r.getArea());   // => 200
  */
-function Rectangle(width, height) {
-  this.width = width;
-  this.height = height;
-  this.getArea = () => width * height;
+// eslint-disable-next-line max-classes-per-file
+class Rectangle {
+  constructor(width, height) {
+    this.width = width;
+    this.height = height;
+    this.getArea = () => width * height;
+  }
 }
 
 
@@ -53,8 +56,9 @@ function getJSON(obj) {
  *    const r = fromJSON(Circle.prototype, '{"radius":10}');
  *
  */
-function fromJSON(/* proto, json */) {
-  throw new Error('Not implemented');
+function fromJSON(proto, json) {
+  // throw new Error('Not implemented');
+  return Object.assign(Object.create(proto), JSON.parse(json));
 }
 
 
@@ -111,34 +115,107 @@ function fromJSON(/* proto, json */) {
  *
  *  For more examples see unit tests.
  */
+class MySuperBaseElementSelector {
+  constructor() {
+    this.qElement = '';
+    this.qId = '';
+    this.qClass = '';
+    this.qAttr = '';
+    this.qPseudoClass = '';
+    this.qPseudoElement = '';
+    this.qCombine = '';
+  }
+
+  stringify() {
+    return this.qCombine ? this.qCombine : this.qElement
+      + this.qId
+      + this.qClass
+      + this.qAttr
+      + this.qPseudoClass
+      + this.qPseudoElement;
+  }
+}
 
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  element(value) {
+    if (!(this instanceof MySuperBaseElementSelector)) {
+      Object.assign(MySuperBaseElementSelector.prototype, this);
+      const instance = new MySuperBaseElementSelector();
+      instance.qElement = value;
+      return instance;
+    }
+    if (this.qElement) throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
+    if (this.qId || this.qClass || this.qAttr || this.qPseudoClass || this.qPseudoElement) throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    this.qElement = value;
+    return this;
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    if (!(this instanceof MySuperBaseElementSelector)) {
+      Object.assign(MySuperBaseElementSelector.prototype, this);
+      const instance = new MySuperBaseElementSelector();
+      instance.qId += `#${value}`;
+      return instance;
+    }
+    if (this.qId) throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
+    if (this.qClass || this.qAttr || this.qPseudoClass || this.qPseudoElement) throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    this.qId += `#${value}`;
+    return this;
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    if (!(this instanceof MySuperBaseElementSelector)) {
+      Object.assign(MySuperBaseElementSelector.prototype, this);
+      const instance = new MySuperBaseElementSelector();
+      instance.qClass += `.${value}`;
+      return instance;
+    }
+    if (this.qAttr || this.qPseudoClass || this.qPseudoElement) throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    this.qClass += `.${value}`;
+    return this;
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    if (!(this instanceof MySuperBaseElementSelector)) {
+      Object.assign(MySuperBaseElementSelector.prototype, this);
+      const instance = new MySuperBaseElementSelector();
+      instance.qAttr += `[${value}]`;
+      return instance;
+    }
+    if (this.qPseudoClass || this.qPseudoElement) throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    this.qAttr += `[${value}]`;
+    return this;
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    if (!(this instanceof MySuperBaseElementSelector)) {
+      Object.assign(MySuperBaseElementSelector.prototype, this);
+      const instance = new MySuperBaseElementSelector();
+      instance.qPseudoClass += `:${value}`;
+      return instance;
+    }
+    if (this.qPseudoElement) throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    this.qPseudoClass += `:${value}`;
+    return this;
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    if (!(this instanceof MySuperBaseElementSelector)) {
+      Object.assign(MySuperBaseElementSelector.prototype, this);
+      const instance = new MySuperBaseElementSelector();
+      instance.qPseudoElement += `::${value}`;
+      return instance;
+    }
+    if (this.qPseudoElement) throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
+    this.qPseudoElement += `::${value}`;
+    return this;
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  combine(selector1, combinator, selector2) {
+    Object.assign(MySuperBaseElementSelector.prototype, this);
+    const instance = new MySuperBaseElementSelector();
+    instance.qCombine += `${selector1.stringify()} ${combinator} ${selector2.stringify()}`;
+    return instance;
   },
 };
 
