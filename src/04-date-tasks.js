@@ -100,10 +100,14 @@ function timeSpanToString(startDate, endDate) {
  *    Date.UTC(2016,3,5,18, 0) => Math.PI
  *    Date.UTC(2016,3,5,21, 0) => Math.PI/2
  */
-function angleBetweenClockHands(/* date */) {
+function angleBetweenClockHands(date) {
   // Pi / 360 * (60 * hh - 11 * mm)
   // если больше 180 град, то разница от 360
-  throw new Error('Not implemented');
+  // throw new Error('Not implemented');
+  const hh = date.getUTCHours() > 12 ? date.getUTCHours() - 12 : date.getUTCHours();
+  const mm = date.getUTCMinutes();
+  const degrees = Math.abs(0.5 * ((60 * hh) - (11 * mm)));
+  return (degrees > 180 ? 360 - degrees : degrees) * (Math.PI / 180);
 }
 
 
